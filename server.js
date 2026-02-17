@@ -34,13 +34,18 @@ app.post(
 
     if (event.type === "checkout.session.completed") {
       const session = event.data.object;
+      const meta = session.metadata || {};
+
       console.log("--- Payment Successful ---");
-      console.log("Customer:", session.customer_details?.name);
-      console.log("Email:", session.customer_details?.email);
+      console.log("Customer:", meta.customerName);
+      console.log("Email:", meta.customerEmail);
+      console.log("Phone:", meta.customerPhone);
+      console.log("Address:", meta.customerAddress);
+      console.log("Service:", meta.serviceName);
+      console.log("Delivery:", meta.deliveryOption, meta.selectedCity || "");
       console.log("Amount:", session.amount_total / 100, session.currency?.toUpperCase());
       console.log("Session ID:", session.id);
-      console.log("Metadata:", session.metadata);
-      // TODO: Add your own logic here (save to DB, send email, etc.)
+      console.log("Message:", meta.serviceMessage);
     }
 
     res.json({ received: true });
@@ -86,9 +91,12 @@ app.post("/payment/create-session", async (req, res) => {
       metadata: {
         customerName: customer.name,
         customerEmail: customer.email,
+        customerPhone: customer.phone || "",
+        customerAddress: (customer.address || "").substring(0, 500),
         serviceName: serviceName,
         deliveryOption: service?.deliveryOption || "",
         selectedCity: service?.selectedCity || "",
+        serviceMessage: (service?.message || "").substring(0, 500),
       },
       success_url: `${process.env.CLIENT_URL}/#/submit-success`,
       cancel_url: `${process.env.CLIENT_URL}/#/submit-cancel`,
