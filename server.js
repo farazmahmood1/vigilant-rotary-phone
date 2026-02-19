@@ -8,6 +8,7 @@ const app = express();
 // --- CORS ---
 const allowedOrigins = [
   process.env.CLIENT_URL,
+  "https://www.khidmaatt.com",
   "http://localhost:3000",
   "http://localhost:5173",
 ].filter(Boolean);
